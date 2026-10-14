@@ -190,6 +190,58 @@ Planned MVP functionality:
 - Performance monitoring and caching.
 - Deployment and scalability improvements.
 
+## Running the Backend Locally
+
+### Requirements
+
+- .NET 10 SDK
+- Visual Studio Code or Visual Studio
+
+### Build the API
+
+From the root of the RequestTask repository, run:
+
+```powershell
+dotnet build backend/RequestTask.Api
+```
+
+### Start the API
+
+```powershell
+dotnet run --project backend/RequestTask.Api
+```
+
+The API will start using the address configured in
+`backend/RequestTask.Api/Properties/launchSettings.json`.
+
+### Test the Health Endpoint
+
+Open a second terminal while the API is running:
+
+```powershell
+Invoke-RestMethod http://localhost:5293/health
+```
+
+Expected JSON response:
+
+```json
+{
+  "status": "Healthy",
+  "application": "RequestTask API"
+}
+```
+
+The health endpoint confirms that the application is responding.
+Database and external service health checks will be added later.
+
+### Current Backend Status
+
+- ASP.NET Core 10 Web API initialized
+- Default weather forecast example removed
+- Health-check endpoint implemented and tested
+- Backend builds and runs locally
+- Database integration planned for future development
+
 ## Project Status
 
 **Current Phase:** Requirements and Architecture Planning
