@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,10 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore backend/RequestTask.Api/RequestTask.Api.csproj
+        run: dotnet restore backend/RequestTask.Api.Tests/RequestTask.Api.Tests.csproj
 
-      - name: Build backend
-        run: dotnet build backend/RequestTask.Api/RequestTask.Api.csproj --configuration Release --no-restore
+      - name: Build backend and tests
+        run: dotnet build backend/RequestTask.Api.Tests/RequestTask.Api.Tests.csproj --configuration Release --no-restore
+
+      - name: Run automated tests
+        run: dotnet test backend/RequestTask.Api.Tests/RequestTask.Api.Tests.csproj --configuration Release --no-build
