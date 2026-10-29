@@ -6,11 +6,11 @@ using RequestTask.Api.Models;
 
 namespace RequestTask.Api.Tests;
 
-public class TicketApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class TicketApiTests : IClassFixture<TicketApiFactory>
 {
     private readonly HttpClient _client;
 
-    public TicketApiTests(WebApplicationFactory<Program> factory)
+    public TicketApiTests(TicketApiFactory factory)
     {
         _client = factory.CreateClient();
     }
