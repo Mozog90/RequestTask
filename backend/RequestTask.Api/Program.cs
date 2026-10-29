@@ -1,10 +1,17 @@
 
-using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
+using RequestTask.Api.Data;
 using RequestTask.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+// Connect Entity Framework Core to PostgreSQL
+builder.Services.AddDbContext<RequestTaskDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("RequestTask")
+    ));
 
 var app = builder.Build();
 
@@ -14,9 +21,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Temporary storage until PostgreSQL is implemented
-var tickets = new ConcurrentDictionary<Guid, Ticket>();
 
 // Health-check endpoint
 app.MapGet("/health", () =>
@@ -29,8 +33,10 @@ app.MapGet("/health", () =>
 })
 .WithName("GetHealth");
 
-// Create a new ticket
-app.MapPost("/tickets", (CreateTicketRequest request) =>
+// Create a ticket and save it to PostgreSQL
+app.MapPost("/tickets", async (
+    CreateTicketRequest request,
+    RequestTaskDbContext db) =>
 {
     if (string.IsNullOrWhiteSpace(request.Title) ||
         string.IsNullOrWhiteSpace(request.Description) ||
@@ -50,33 +56,36 @@ app.MapPost("/tickets", (CreateTicketRequest request) =>
             : request.Priority.Trim()
     };
 
-    tickets[ticket.Id] = ticket;
+    db.Tickets.Add(ticket);
+    await db.SaveChangesAsync();
 
     return Results.Created($"/tickets/{ticket.Id}", ticket);
 })
 .WithName("CreateTicket");
 
-// Retrieve a ticket by ID
-app.MapGet("/tickets/{id:guid}", (Guid id) =>
+// Retrieve a ticket from PostgreSQL
+app.MapGet("/tickets/{id:guid}", async (
+    Guid id,
+    RequestTaskDbContext db) =>
 {
-    if (tickets.TryGetValue(id, out var ticket))
+    var ticket = await db.Tickets.FindAsync(id);
+
+    if (ticket is null)
     {
-        return Results.Ok(ticket);
+        return Results.NotFound("Ticket not found.");
     }
 
-    return Results.NotFound("Ticket not found.");
+    return Results.Ok(ticket);
 })
 .WithName("GetTicket");
 
 app.Run();
 
-// Request body for creating tickets
 record CreateTicketRequest(
     string? Title,
     string? Description,
     string? Type,
     string? Priority
 );
-
 
 public partial class Program { }
