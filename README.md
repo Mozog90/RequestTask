@@ -2,227 +2,267 @@
 
 RequestTask is an AI-assisted ticketing and workflow management system designed to help product and development teams organize, assign, and track software development requests.
 
-The goal is to simplify how tickets move between teams by using AI to analyze incoming requests, identify relevant information, estimate complexity, and recommend where work should be assigned.
+The goal is to simplify how tickets move between teams by using AI to analyze incoming requests, identify relevant information, and recommend where work should be assigned.
 
-The system is intended to be flexible enough for different organizations and departments, including government agencies.
+The system is designed to support different organizations and departments, including government agencies.
 
 ## Project Goals
 
-- Simplify ticket submission and assignment.
-- Reduce the need for manual ticket triage.
-- Use AI to help classify and route development requests.
-- Match tickets to appropriate teams and developer skill levels.
-- Maintain clear ticket ownership throughout development.
+- Simplify ticket submission and management.
+- Reduce manual ticket triage.
+- Use AI to classify and route development requests.
+- Match tickets to appropriate teams and developers.
+- Track ticket status and ownership.
 - Support QA testing and feedback.
-- Keep a history of ticket activity and decisions.
-- Provide a modular architecture that can evolve over time.
+- Maintain a history of ticket activity and decisions.
+- Use a modular architecture that can expand over time.
 
 ## Planned Features
 
 ### Ticket Management
 
 - Create tickets for bugs, feature requests, and application changes.
-- Include descriptions, priorities, categories, and attachments.
-- Track ticket status, ownership, and assignment history.
-- Allow assigned users to update progress and add comments.
-- Support returning or redirecting tickets with an explanation.
+- Store descriptions, priorities, and ticket statuses.
+- Update ticket status throughout development.
+- Track assignments, ownership, and ticket history.
 
 ### AI-Assisted Ticket Analysis
 
-- Extract relevant keywords from ticket descriptions.
-- Suggest ticket categories and tags.
-- Identify potentially duplicate tickets.
-- Estimate ticket complexity and risk.
-- Recommend appropriate teams or developer skill levels.
-- Flag uncertain or high-risk tickets for human review.
+- Extract keywords from ticket descriptions.
+- Suggest categories and priorities.
+- Estimate ticket complexity.
+- Recommend appropriate development teams.
+- Flag uncertain requests for human review.
 
-### Intelligent Ticket Routing
+### Ticket Routing
 
-- Route routine, low-risk tickets using AI recommendations and predefined rules.
-- Send complex, high-risk, or uncertain tickets to a team lead for review.
-- Consider developer skills and availability when assigning work.
-- Allow authorized users to override routing decisions.
-- Record routing decisions and reasons for reassignment.
+- Route routine tickets automatically when appropriate.
+- Send complex requests to a team lead.
+- Allow team leads to redirect or reject requests.
+- Track assignment and routing decisions.
 
-### Developer Workflow
+### Developer and QA Workflow
 
-- Developers receive tickets assigned to them.
-- Developers can accept, update, or return assignments.
-- Tickets move through defined development statuses.
-- Completed development work is submitted to QA for verification.
-
-### QA Testing
-
-- QA testers receive tickets awaiting verification.
-- Testers can record results and provide feedback.
-- Failed tickets return to development for corrections.
-- Successfully verified tickets can be closed.
-- Testing history is preserved for future reference.
+- Developers receive and work on assigned tickets.
+- Completed development work moves to QA.
+- QA testers verify changes and record results.
+- Failed tickets return to development.
+- Verified tickets can be marked as completed.
 
 ### User Management
 
-- Authentication and role-based authorization.
-- Roles for product teams, developers, QA testers, team leads, and administrators.
-- Permissions based on user responsibilities.
-- Management of teams and department assignments.
+- Authentication and role-based permissions.
+- Roles for Product Team, Developer, QA Tester, Team Lead, and Administrator.
 
 ## Ticket Workflow
 
-1. **Product Team**
-   - Submits a bug report, feature request, or application change.
+The planned workflow is:
 
-2. **AI Analysis**
-   - Analyzes the ticket description.
-   - Extracts keywords and suggests categories.
-   - Identifies potential duplicates.
-   - Estimates complexity and risk.
-   - Recommends an appropriate destination.
+1. Product Team submits a ticket.
+2. AI analyzes the request and suggests routing.
+3. The ticket is assigned automatically or sent to a team lead.
+4. A developer works on the request.
+5. Completed work is submitted to QA.
+6. QA approves the work or returns it for corrections.
+7. Verified tickets are marked as completed.
 
-3. **Ticket Routing**
-   - Routine tickets can move automatically to the appropriate development queue.
-   - Assignment rules can consider skills, availability, and workload.
-   - Complex, high-risk, or uncertain tickets are escalated to a team lead.
-   - Team leads can approve, redirect, return, or reject tickets with an explanation.
+AI will assist with routing, but human review and manual assignment will remain available.
 
-4. **Development**
-   - An assigned developer takes ownership of the ticket.
-   - The developer investigates and implements the requested changes.
-   - Incorrect assignments can be returned or redirected.
-   - Completed work is submitted for testing.
+The full workflow is still under development.
 
-5. **QA Testing**
-   - A tester takes ownership and verifies the implementation.
-   - Failed tests return the ticket to development with feedback.
-   - Successful verification allows the ticket to proceed to completion.
+## Technology Stack
 
-6. **Completion**
-   - The ticket is marked as completed.
-   - Assignment history, development updates, and testing results are preserved.
+| Component                    | Technology                   |
+| ---------------------------- | ---------------------------- |
+| Frontend (Planned)           | React, TypeScript            |
+| Backend                      | C#, ASP.NET Core 10          |
+| Database                     | PostgreSQL 16                |
+| Database Access              | Entity Framework Core        |
+| Authentication (Planned)     | ASP.NET Core Identity        |
+| AI (Planned)                 | Microsoft.Extensions.AI      |
+| Testing                      | xUnit, SQLite in-memory      |
+| End-to-End Testing (Planned) | Playwright                   |
+| Development                  | Docker, Git, GitHub, VS Code |
 
-AI assists with classification and routing, but authorized users can review and override its recommendations.
+## System Architecture
 
-## Proposed Technology Stack
+RequestTask uses a modular monolith architecture.
 
-### Frontend
-
-- React
-- TypeScript
-
-### Backend
-
-- C#
-- ASP.NET Core Web API
-- Entity Framework Core
-
-### Database
-
-- PostgreSQL
-
-### AI Integration
-
-- Microsoft.Extensions.AI
-- Configurable AI model provider
-- AI-assisted classification, keyword extraction, and routing recommendations
-
-### Authentication and Authorization
-
-- ASP.NET Core Identity
-- Role-based access control
-
-### Testing
-
-- xUnit for backend unit and integration testing
-- Playwright for end-to-end testing
-
-### Development and Deployment
-
-- Git and GitHub
-- Docker and Docker Compose
-- Visual Studio Code
-
-## Proposed Architecture
-
-RequestTask will initially use a modular monolith architecture.
-
-The application will be organized into separate components responsible for:
+The planned application modules include:
 
 - Ticket Management
-- Workflow Management
+- Workflow and Routing
 - AI Processing
 - User Management
 - QA Management
-- Notifications
 
-The React frontend will communicate with the ASP.NET Core backend through REST APIs.
+The backend communicates with PostgreSQL using Entity Framework Core. The planned React frontend will communicate with the backend through REST APIs.
 
-PostgreSQL will provide persistent storage for users, tickets, teams, assignments, AI recommendations, and activity history.
+AI processing will remain separate from core ticket management so the application can continue functioning if AI services are unavailable.
 
-AI processing will be separated from core ticket management so that ticket creation and manual routing can continue if the AI service is unavailable.
+More details are available in [Architecture Documentation](docs/architecture.md).
 
-## System Design Diagram
+### System Design Diagram
 
-![RequestTask System Design](docs/images/system-design-overview.png)
+![RequestTask System Design](docs/images/RequestTask%20System%20Design%20Overview.png)
 
-## Initial Development Scope (MVP)
+## Current Backend Features
 
-The first version will focus on building a complete ticket lifecycle.
+The following features have been implemented:
 
-Planned MVP functionality:
+- ASP.NET Core 10 Web API
+- PostgreSQL persistence using Entity Framework Core
+- Initial database migration
+- Ticket model with ID, title, description, type, priority, status, and creation date
+- Ticket creation and retrieval
+- Ticket status updates
+- Validation for required fields and allowed statuses
+- Automated API integration tests
+- GitHub Actions for backend builds and tests
 
-1. User authentication and basic roles.
-2. Ticket creation and management.
-3. Basic AI keyword extraction and category suggestions.
-4. Rule-based ticket routing with human escalation.
-5. Developer assignment and status updates.
-6. QA verification and return-to-development workflow.
-7. Ticket ownership and activity history.
-8. Basic automated testing.
+### API Endpoints
 
-## Future Enhancements
+| Method | Endpoint               | Description              |
+| ------ | ---------------------- | ------------------------ |
+| GET    | `/health`              | Check API health         |
+| POST   | `/tickets`             | Create a ticket          |
+| GET    | `/tickets/{id}`        | Retrieve a ticket        |
+| PATCH  | `/tickets/{id}/status` | Update a ticket's status |
 
-- AI-assisted duplicate ticket detection.
-- More advanced complexity and risk analysis.
-- Developer workload and availability tracking.
-- AI-generated test case suggestions.
-- Configurable routing rules for different organizations.
-- Dashboards and reporting.
-- Background notifications.
-- Performance monitoring and caching.
-- Deployment and scalability improvements.
+### Ticket Creation
+
+Example request to `POST /tickets`:
+
+```json
+{
+  "title": "Login page not working",
+  "description": "Users cannot log in.",
+  "type": "Bug",
+  "priority": "High"
+}
+```
+
+A valid request returns HTTP 201 Created.
+
+Tickets receive a unique ID and start with the status `Submitted`.
+
+### Ticket Status Updates
+
+The `PATCH /tickets/{id}/status` endpoint allows an existing ticket's status to be changed.
+
+Example request:
+
+```json
+{
+  "status": "In Development"
+}
+```
+
+Supported statuses:
+
+- Submitted
+- Triaging
+- Awaiting Assignment
+- In Development
+- In QA
+- Completed
+- Needs Information
+- Rejected
+
+The API validates the requested status and saves valid changes to PostgreSQL.
+
+- Valid updates return HTTP 200.
+- Invalid statuses return HTTP 400.
+- Nonexistent tickets return HTTP 404.
+
+Role-based permissions and restrictions on status transitions will be added later.
 
 ## Running the Backend Locally
 
 ### Requirements
 
 - .NET 10 SDK
+- Docker Desktop
+- PostgreSQL 16 container
 - Visual Studio Code or Visual Studio
 
-### Build the API
+### Start PostgreSQL
 
-From the root of the RequestTask repository, run:
-
-```powershell
-dotnet build backend/RequestTask.Api
-```
-
-### Start the API
+Start Docker Desktop, then run:
 
 ```powershell
-dotnet run --project backend/RequestTask.Api
+docker start requesttask-postgres
 ```
 
-The API will start using the address configured in
-`backend/RequestTask.Api/Properties/launchSettings.json`.
+Check that the database container is running:
+
+```powershell
+docker ps
+```
+
+The local development database uses port `5434`.
+
+If setting up the project on a new computer, create a PostgreSQL container first:
+
+```powershell
+docker run --name requesttask-postgres -e POSTGRES_USER=requesttask -e POSTGRES_PASSWORD=YOUR_LOCAL_PASSWORD -e POSTGRES_DB=requesttask -p 127.0.0.1:5434:5432 -v requesttask_pgdata:/var/lib/postgresql/data -d postgres:16
+```
+
+Replace `YOUR_LOCAL_PASSWORD` with a development password.
+
+### Configure the Connection
+
+The application uses .NET User Secrets to keep database credentials outside the repository.
+
+Set the connection string using:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:RequestTask" "Host=localhost;Port=5434;Database=requesttask;Username=requesttask;Password=YOUR_LOCAL_PASSWORD" --project backend/RequestTask.Api/RequestTask.Api.csproj
+```
+
+Use the same password configured for PostgreSQL.
+
+Do not commit passwords or connection secrets to GitHub.
+
+### Apply Database Migrations
+
+Run:
+
+```powershell
+dotnet ef database update --project backend/RequestTask.Api/RequestTask.Api.csproj
+```
+
+This applies the existing database migrations.
+
+The `dotnet-ef` command-line tool must be installed.
+
+### Build the Backend
+
+From the repository root:
+
+```powershell
+dotnet build backend/RequestTask.Api/RequestTask.Api.csproj
+```
+
+### Run the API
+
+```powershell
+dotnet run --project backend/RequestTask.Api/RequestTask.Api.csproj
+```
+
+The development API runs at:
+
+http://localhost:5293
 
 ### Test the Health Endpoint
 
-Open a second terminal while the API is running:
+Open another PowerShell terminal:
 
 ```powershell
 Invoke-RestMethod http://localhost:5293/health
 ```
 
-Expected JSON response:
+Expected response:
 
 ```json
 {
@@ -231,67 +271,90 @@ Expected JSON response:
 }
 ```
 
-The health endpoint confirms that the application is responding.
-Database and external service health checks will be added later.
+This endpoint confirms the API is responding. It does not currently check database connectivity.
 
-### Current Backend Status
+## Automated Testing
 
-The RequestTask backend is now in active development.
+RequestTask uses xUnit for backend integration testing.
 
-**Implemented:**
+Tests run against a temporary SQLite in-memory database so they do not modify PostgreSQL development data.
 
-- ASP.NET Core 10 Web API
-- `GET /health` endpoint to verify the application is running
-- `POST /tickets` endpoint to create tickets
-- `GET /tickets/{id}` endpoint to retrieve individual tickets
-- Ticket model with ID, title, description, type, priority, status, and creation timestamp
-- Basic validation for required ticket fields
-- Automatic ticket IDs and initial `Submitted` status
-- Temporary in-memory ticket storage
-- Five automated xUnit integration tests
-- GitHub Actions workflow for automated builds and testing
+### Test Coverage
 
-### Ticket API Testing
+| Test                            | Expected Result                     |
+| ------------------------------- | ----------------------------------- |
+| Create valid ticket             | HTTP 201                            |
+| Retrieve existing ticket        | HTTP 200                            |
+| Reject empty ticket title       | HTTP 400                            |
+| Retrieve nonexistent ticket     | HTTP 404                            |
+| Check health endpoint           | HTTP 200                            |
+| Update ticket with valid status | HTTP 200, status saved              |
+| Reject invalid status           | HTTP 400, original status unchanged |
+| Update nonexistent ticket       | HTTP 404                            |
 
-The following API functionality has been tested:
-
-| Test                           | Expected Result      | Status |
-| ------------------------------ | -------------------- | ------ |
-| Create valid ticket            | HTTP 201 Created     | Passed |
-| Retrieve existing ticket       | HTTP 200 OK          | Passed |
-| Create ticket with empty title | HTTP 400 Bad Request | Passed |
-| Retrieve nonexistent ticket    | HTTP 404 Not Found   | Passed |
-| Check API health               | HTTP 200 OK          | Passed |
-
-Run the automated tests using:
+Run the tests:
 
 ```powershell
 dotnet test backend/RequestTask.Api.Tests/RequestTask.Api.Tests.csproj
 ```
 
-All five tests passed in both Debug and Release configurations.
+**Latest local result: 8 tests passed, 0 failed.**
 
-**Current Limitations:**
+GitHub Actions is configured to run the backend build and automated tests.
 
-Tickets are temporarily stored in memory and will be lost when the application restarts. Database persistence has not been implemented yet.
+## Development Progress
 
-Authentication, AI-assisted classification, automatic routing, developer assignments, and QA workflows are planned for future development.
+### Completed
+
+**Issue #1 — Requirements and Architecture**
+
+- Defined the initial requirements and system design.
+- Documented the architecture and planned ticket workflow.
+
+**Issue #3 — Backend Setup**
+
+- Created the ASP.NET Core backend.
+- Implemented the health-check endpoint.
+
+**Issue #5 — Initial Ticket API**
+
+- Added the Ticket model.
+- Implemented ticket creation and retrieval.
+- Added the first five automated tests.
+
+**Issue #7 — PostgreSQL Persistence**
+
+- Integrated PostgreSQL and Entity Framework Core.
+- Created the database migration.
+- Replaced temporary in-memory ticket storage.
+- Verified tickets persist after API restarts.
+
+### Current Development
+
+**Issue #9 — Ticket Status Updates**
+
+- Implemented `PATCH /tickets/{id}/status`.
+- Added status validation and database updates.
+- Added three automated tests.
+- Confirmed all eight tests pass locally.
+- Preparing the changes for a pull request.
+
+## Next Steps
+
+- Add valid workflow transition rules.
+- Implement developer and team assignments.
+- Add ticket activity history.
+- Add authentication and role-based permissions.
+- Begin AI-assisted ticket classification and routing.
+- Develop the initial React frontend.
 
 ## Project Status
 
 **Current Phase:** Core Backend Development
 
-RequestTask has progressed beyond requirements and architecture planning.
+RequestTask currently supports ticket creation, retrieval, and status updates with PostgreSQL persistence.
 
-The initial backend infrastructure and ticket creation and retrieval functionality have been implemented and tested.
-
-The next development milestone is integrating PostgreSQL for persistent ticket storage, followed by expanding ticket management and workflow functionality.
-
-## Project Status
-
-**Current Phase:** Requirements and Architecture Planning
-
-RequestTask is currently in the initial planning stage. The features and architectural components described in this README represent the intended design and will be implemented incrementally.
+The next phase will expand ticket management into developer assignments, workflow controls, and AI-assisted routing.
 
 ## Academic Project
 

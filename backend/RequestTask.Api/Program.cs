@@ -79,6 +79,49 @@ app.MapGet("/tickets/{id:guid}", async (
 })
 .WithName("GetTicket");
 
+
+app.MapPatch("/tickets/{id:guid}/status", async (
+    Guid id,
+    UpdateTicketStatusRequest request,
+    RequestTaskDbContext db) =>
+{
+    string[] allowedStatuses =
+    [
+        "Submitted",
+        "Triaging",
+        "Awaiting Assignment",
+        "In Development",
+        "In QA",
+        "Completed",
+        "Needs Information",
+        "Rejected"
+    ];
+
+    var newStatus = allowedStatuses.FirstOrDefault(
+        status => status.Equals(
+            request.Status?.Trim(),
+            StringComparison.OrdinalIgnoreCase));
+
+    if (newStatus is null)
+    {
+        return Results.BadRequest("Invalid ticket status.");
+    }
+
+    var ticket = await db.Tickets.FindAsync(id);
+
+    if (ticket is null)
+    {
+        return Results.NotFound("Ticket not found.");
+    }
+
+    ticket.Status = newStatus;
+    await db.SaveChangesAsync();
+
+    return Results.Ok(ticket);
+})
+.WithName("UpdateTicketStatus");
+
+
 app.Run();
 
 record CreateTicketRequest(
@@ -87,5 +130,7 @@ record CreateTicketRequest(
     string? Type,
     string? Priority
 );
+
+record UpdateTicketStatusRequest(string? Status);
 
 public partial class Program { }

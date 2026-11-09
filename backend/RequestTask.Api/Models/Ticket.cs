@@ -13,7 +13,7 @@ public class Ticket
 
     public string Priority { get; init; } = "Medium";
 
-    public string Status { get; init; } = "Submitted";
+    public string Status { get; set; } = "Submitted";
 
     public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
 }
