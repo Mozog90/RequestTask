@@ -63,6 +63,21 @@ app.MapPost("/tickets", async (
 })
 .WithName("CreateTicket");
 
+
+ // Retrieve all tickets from PostgreSQL
+app.MapGet("/tickets", async (RequestTaskDbContext db) =>
+{
+    var tickets = await db.Tickets.ToListAsync();
+
+    var sortedTickets = tickets
+        .OrderByDescending(ticket => ticket.CreatedAt)
+        .ToList();
+
+    return Results.Ok(sortedTickets);
+})
+.WithName("GetAllTickets");
+
+
 // Retrieve a ticket from PostgreSQL
 app.MapGet("/tickets/{id:guid}", async (
     Guid id,
