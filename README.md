@@ -119,15 +119,17 @@ The following features have been implemented:
 - Validation for required fields and allowed statuses
 - Automated API integration tests
 - GitHub Actions for backend builds and tests
+- Retrieve all tickets from PostgreSQL, ordered by creation date
 
 ### API Endpoints
 
-| Method | Endpoint               | Description              |
-| ------ | ---------------------- | ------------------------ |
-| GET    | `/health`              | Check API health         |
-| POST   | `/tickets`             | Create a ticket          |
-| GET    | `/tickets/{id}`        | Retrieve a ticket        |
-| PATCH  | `/tickets/{id}/status` | Update a ticket's status |
+| Method | Endpoint               | Description                        |
+| ------ | ---------------------- | ---------------------------------- |
+| GET    | `/health`              | Check API health                   |
+| POST   | `/tickets`             | Create a ticket                    |
+| GET    | `/tickets/{id}`        | Retrieve a ticket                  |
+| PATCH  | `/tickets/{id}/status` | Update a ticket's status           |
+| GET    | `/tickets`             | Retrieve all tickets, newest first |
 
 ### Ticket Creation
 
@@ -281,16 +283,18 @@ Tests run against a temporary SQLite in-memory database so they do not modify Po
 
 ### Test Coverage
 
-| Test                            | Expected Result                     |
-| ------------------------------- | ----------------------------------- |
-| Create valid ticket             | HTTP 201                            |
-| Retrieve existing ticket        | HTTP 200                            |
-| Reject empty ticket title       | HTTP 400                            |
-| Retrieve nonexistent ticket     | HTTP 404                            |
-| Check health endpoint           | HTTP 200                            |
-| Update ticket with valid status | HTTP 200, status saved              |
-| Reject invalid status           | HTTP 400, original status unchanged |
-| Update nonexistent ticket       | HTTP 404                            |
+| Test                                 | Expected Result                     |
+| ------------------------------------ | ----------------------------------- |
+| Create valid ticket                  | HTTP 201                            |
+| Retrieve existing ticket             | HTTP 200                            |
+| Reject empty ticket title            | HTTP 400                            |
+| Retrieve nonexistent ticket          | HTTP 404                            |
+| Check health endpoint                | HTTP 200                            |
+| Update ticket with valid status      | HTTP 200, status saved              |
+| Reject invalid status                | HTTP 400, original status unchanged |
+| Update nonexistent ticket            | HTTP 404                            |
+| Retrieve all tickets                 | HTTP 200, tickets returned          |
+| Retrieve tickets from empty database | HTTP 200, empty list                |
 
 Run the tests:
 
@@ -298,7 +302,7 @@ Run the tests:
 dotnet test backend/RequestTask.Api.Tests/RequestTask.Api.Tests.csproj
 ```
 
-**Latest local result: 8 tests passed, 0 failed.**
+**Latest local result: 10 tests passed, 0 failed.**
 
 GitHub Actions is configured to run the backend build and automated tests.
 
@@ -329,18 +333,29 @@ GitHub Actions is configured to run the backend build and automated tests.
 - Replaced temporary in-memory ticket storage.
 - Verified tickets persist after API restarts.
 
-### Current Development
-
 **Issue #9 — Ticket Status Updates**
 
 - Implemented `PATCH /tickets/{id}/status`.
 - Added status validation and database updates.
 - Added three automated tests.
-- Confirmed all eight tests pass locally.
-- Preparing the changes for a pull request.
+- Confirmed all eight tests passed locally.
+- Completed and merged PR #10.
+
+### Current Development
+
+**Issue #11 — List All Tickets**
+
+- Added `GET /tickets` to retrieve all saved tickets.
+- Tickets are returned with the newest first.
+- Returns an empty list when no tickets exist.
+- Added two automated tests.
+- Fixed a SQLite sorting issue discovered during testing.
+- Confirmed all 10 automated tests passed locally.
+- Preparing changes for a pull request.
 
 ## Next Steps
 
+- Complete and merge Issue #11.
 - Add valid workflow transition rules.
 - Implement developer and team assignments.
 - Add ticket activity history.
@@ -352,7 +367,7 @@ GitHub Actions is configured to run the backend build and automated tests.
 
 **Current Phase:** Core Backend Development
 
-RequestTask currently supports ticket creation, retrieval, and status updates with PostgreSQL persistence.
+RequestTask currently supports ticket creation, retrieval, status updates, and listing all tickets with PostgreSQL persistence.
 
 The next phase will expand ticket management into developer assignments, workflow controls, and AI-assisted routing.
 
