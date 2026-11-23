@@ -59,11 +59,17 @@ The system is designed to support different organizations and departments, inclu
 The planned workflow is:
 
 1. Product Team submits a ticket.
+
 2. AI analyzes the request and suggests routing.
+
 3. The ticket is assigned automatically or sent to a team lead.
+
 4. A developer works on the request.
+
 5. Completed work is submitted to QA.
+
 6. QA approves the work or returns it for corrections.
+
 7. Verified tickets are marked as completed.
 
 AI will assist with routing, but human review and manual assignment will remain available.
@@ -72,17 +78,17 @@ The full workflow is still under development.
 
 ## Technology Stack
 
-| Component                    | Technology                   |
+| Component                    | Technology                   |
 | ---------------------------- | ---------------------------- |
-| Frontend (Planned)           | React, TypeScript            |
-| Backend                      | C#, ASP.NET Core 10          |
-| Database                     | PostgreSQL 16                |
-| Database Access              | Entity Framework Core        |
-| Authentication (Planned)     | ASP.NET Core Identity        |
-| AI (Planned)                 | Microsoft.Extensions.AI      |
-| Testing                      | xUnit, SQLite in-memory      |
-| End-to-End Testing (Planned) | Playwright                   |
-| Development                  | Docker, Git, GitHub, VS Code |
+| Frontend (Planned)           | React, TypeScript            |
+| Backend                      | C#, ASP.NET Core 10          |
+| Database                     | PostgreSQL 16                |
+| Database Access              | Entity Framework Core        |
+| Authentication (Planned)     | ASP.NET Core Identity        |
+| AI (Planned)                 | Microsoft.Extensions.AI      |
+| Testing                      | xUnit, SQLite in-memory      |
+| End-to-End Testing (Planned) | Playwright                   |
+| Development                  | Docker, Git, GitHub, VS Code |
 
 ## System Architecture
 
@@ -123,13 +129,30 @@ The following features have been implemented:
 
 ### API Endpoints
 
-| Method | Endpoint               | Description                        |
-| ------ | ---------------------- | ---------------------------------- |
-| GET    | `/health`              | Check API health                   |
-| POST   | `/tickets`             | Create a ticket                    |
-| GET    | `/tickets/{id}`        | Retrieve a ticket                  |
-| PATCH  | `/tickets/{id}/status` | Update a ticket's status           |
-| GET    | `/tickets`             | Retrieve all tickets, newest first |
+| Method | Endpoint                    | Description                        |
+| ------ | --------------------------- | ---------------------------------- |
+| GET    | `/health`                   | Check API health                   |
+| POST   | `/tickets`                  | Create a ticket                    |
+| GET    | `/tickets/{id}`             | Retrieve a ticket                  |
+| PATCH  | `/tickets/{id}/status`      | Update a ticket's status           |
+| GET    | `/tickets`                  | Retrieve all tickets, newest first |
+| GET    | `/tickets?status=Submitted` | Filter tickets by status           |
+
+### Ticket Filtering by Status
+
+The `GET /tickets` endpoint supports an optional status filter.
+
+Examples:
+
+- `GET /tickets` - Returns all tickets.
+- `GET /tickets?status=Submitted` - Returns submitted tickets.
+- `GET /tickets?status=In%20Development` - Returns tickets in development.
+
+Filtering is case-insensitive and ignores extra spaces.
+
+Invalid statuses return HTTP 400.
+
+Ticket filtering is covered by automated integration tests.
 
 ### Ticket Creation
 
@@ -138,8 +161,11 @@ Example request to `POST /tickets`:
 ```json
 {
   "title": "Login page not working",
+
   "description": "Users cannot log in.",
+
   "type": "Bug",
+
   "priority": "High"
 }
 ```
@@ -193,13 +219,17 @@ Role-based permissions and restrictions on status transitions will be added late
 Start Docker Desktop, then run:
 
 ```powershell
+
 docker start requesttask-postgres
+
 ```
 
 Check that the database container is running:
 
 ```powershell
+
 docker ps
+
 ```
 
 The local development database uses port `5434`.
@@ -207,7 +237,9 @@ The local development database uses port `5434`.
 If setting up the project on a new computer, create a PostgreSQL container first:
 
 ```powershell
+
 docker run --name requesttask-postgres -e POSTGRES_USER=requesttask -e POSTGRES_PASSWORD=YOUR_LOCAL_PASSWORD -e POSTGRES_DB=requesttask -p 127.0.0.1:5434:5432 -v requesttask_pgdata:/var/lib/postgresql/data -d postgres:16
+
 ```
 
 Replace `YOUR_LOCAL_PASSWORD` with a development password.
@@ -219,7 +251,9 @@ The application uses .NET User Secrets to keep database credentials outside the 
 Set the connection string using:
 
 ```powershell
+
 dotnet user-secrets set "ConnectionStrings:RequestTask" "Host=localhost;Port=5434;Database=requesttask;Username=requesttask;Password=YOUR_LOCAL_PASSWORD" --project backend/RequestTask.Api/RequestTask.Api.csproj
+
 ```
 
 Use the same password configured for PostgreSQL.
@@ -231,7 +265,9 @@ Do not commit passwords or connection secrets to GitHub.
 Run:
 
 ```powershell
+
 dotnet ef database update --project backend/RequestTask.Api/RequestTask.Api.csproj
+
 ```
 
 This applies the existing database migrations.
@@ -243,13 +279,17 @@ The `dotnet-ef` command-line tool must be installed.
 From the repository root:
 
 ```powershell
+
 dotnet build backend/RequestTask.Api/RequestTask.Api.csproj
+
 ```
 
 ### Run the API
 
 ```powershell
+
 dotnet run --project backend/RequestTask.Api/RequestTask.Api.csproj
+
 ```
 
 The development API runs at:
@@ -261,7 +301,9 @@ http://localhost:5293
 Open another PowerShell terminal:
 
 ```powershell
+
 Invoke-RestMethod http://localhost:5293/health
+
 ```
 
 Expected response:
@@ -269,6 +311,7 @@ Expected response:
 ```json
 {
   "status": "Healthy",
+
   "application": "RequestTask API"
 }
 ```
@@ -283,26 +326,28 @@ Tests run against a temporary SQLite in-memory database so they do not modify Po
 
 ### Test Coverage
 
-| Test                                 | Expected Result                     |
+| Test                                 | Expected Result                     |
 | ------------------------------------ | ----------------------------------- |
-| Create valid ticket                  | HTTP 201                            |
-| Retrieve existing ticket             | HTTP 200                            |
-| Reject empty ticket title            | HTTP 400                            |
-| Retrieve nonexistent ticket          | HTTP 404                            |
-| Check health endpoint                | HTTP 200                            |
-| Update ticket with valid status      | HTTP 200, status saved              |
-| Reject invalid status                | HTTP 400, original status unchanged |
-| Update nonexistent ticket            | HTTP 404                            |
-| Retrieve all tickets                 | HTTP 200, tickets returned          |
-| Retrieve tickets from empty database | HTTP 200, empty list                |
+| Create valid ticket                  | HTTP 201                            |
+| Retrieve existing ticket             | HTTP 200                            |
+| Reject empty ticket title            | HTTP 400                            |
+| Retrieve nonexistent ticket          | HTTP 404                            |
+| Check health endpoint                | HTTP 200                            |
+| Update ticket with valid status      | HTTP 200, status saved              |
+| Reject invalid status                | HTTP 400, original status unchanged |
+| Update nonexistent ticket            | HTTP 404                            |
+| Retrieve all tickets                 | HTTP 200, tickets returned          |
+| Retrieve tickets from empty database | HTTP 200, empty list                |
 
 Run the tests:
 
 ```powershell
+
 dotnet test backend/RequestTask.Api.Tests/RequestTask.Api.Tests.csproj
+
 ```
 
-**Latest local result: 10 tests passed, 0 failed.**
+**Latest local result: 12 tests passed, 0 failed.**
 
 GitHub Actions is configured to run the backend build and automated tests.
 

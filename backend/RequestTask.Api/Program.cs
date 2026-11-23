@@ -64,10 +64,42 @@ app.MapPost("/tickets", async (
 .WithName("CreateTicket");
 
 
- // Retrieve all tickets from PostgreSQL
-app.MapGet("/tickets", async (RequestTaskDbContext db) =>
+
+// Retrieve all tickets, or filter by status
+app.MapGet("/tickets", async (
+    string? status,
+    RequestTaskDbContext db) =>
 {
-    var tickets = await db.Tickets.ToListAsync();
+    IQueryable<Ticket> query = db.Tickets;
+
+    if (status is not null)
+    {
+        string[] allowedStatuses =
+        [
+            "Submitted",
+            "Triaging",
+            "Awaiting Assignment",
+            "In Development",
+            "In QA",
+            "Completed",
+            "Needs Information",
+            "Rejected"
+        ];
+
+        var matchingStatus = allowedStatuses.FirstOrDefault(
+            value => value.Equals(
+                status.Trim(),
+                StringComparison.OrdinalIgnoreCase));
+
+        if (matchingStatus is null)
+        {
+            return Results.BadRequest("Invalid ticket status.");
+        }
+
+        query = query.Where(ticket => ticket.Status == matchingStatus);
+    }
+
+    var tickets = await query.ToListAsync();
 
     var sortedTickets = tickets
         .OrderByDescending(ticket => ticket.CreatedAt)

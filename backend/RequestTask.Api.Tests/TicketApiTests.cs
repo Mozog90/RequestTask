@@ -243,4 +243,62 @@ public class TicketApiTests : IClassFixture<TicketApiFactory>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+
+    [Fact]
+    public async Task GetAllTickets_WithStatusFilter_ReturnsMatchingTickets()
+    {
+        // Create two tickets
+        var firstResponse = await _client.PostAsJsonAsync("/tickets", new
+        {
+            Title = "Filtering test one",
+            Description = "Ticket for status filtering.",
+            Type = "Bug",
+            Priority = "Medium"
+        });
+
+        var secondResponse = await _client.PostAsJsonAsync("/tickets", new
+        {
+            Title = "Filtering test two",
+            Description = "Ticket that stays submitted.",
+            Type = "Feature",
+            Priority = "Low"
+        });
+
+        var firstTicket = await firstResponse.Content.ReadFromJsonAsync<Ticket>();
+        var secondTicket = await secondResponse.Content.ReadFromJsonAsync<Ticket>();
+
+        Assert.NotNull(firstTicket);
+        Assert.NotNull(secondTicket);
+
+        // Update only the first ticket
+        var updateResponse = await _client.PatchAsJsonAsync(
+            $"/tickets/{firstTicket.Id}/status",
+            new { Status = "In Development" });
+
+        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+
+        // Filter using lowercase letters and extra spaces
+        var filter = Uri.EscapeDataString("  in development  ");
+        var response = await _client.GetAsync($"/tickets?status={filter}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var tickets = await response.Content.ReadFromJsonAsync<List<Ticket>>();
+
+        Assert.NotNull(tickets);
+        Assert.Contains(tickets, ticket => ticket.Id == firstTicket.Id);
+        Assert.DoesNotContain(tickets, ticket => ticket.Id == secondTicket.Id);
+        Assert.All(tickets, ticket => Assert.Equal("In Development", ticket.Status));
+    }
+
+    [Fact]
+    public async Task GetAllTickets_WithInvalidStatus_ReturnsBadRequest()
+    {
+        var response = await _client.GetAsync("/tickets?status=Banana");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+
 }
