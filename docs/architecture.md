@@ -183,37 +183,58 @@ The architecture will be evaluated and refined as development progresses.
 
 **Project Phase:** Core Backend Development
 
-RequestTask has completed its initial requirements and architecture planning and has begun implementing the application backend.
+RequestTask has completed its initial requirements and architecture planning and is currently implementing the core backend functionality.
 
 ### Implemented Components
 
 - ASP.NET Core 10 backend API
 - Health-check endpoint
-- Ticket model with basic properties
+- Ticket model with ID, title, description, type, priority, status, and creation date
+- PostgreSQL persistence using Entity Framework Core
+- Database migrations
 - Ticket creation endpoint (`POST /tickets`)
 - Ticket retrieval endpoint (`GET /tickets/{id}`)
-- Basic input validation
-- Temporary in-memory ticket storage
-- xUnit integration testing
-- Automated build and testing through GitHub Actions
+- Ticket listing endpoint (`GET /tickets`)
+- Ticket status update endpoint (`PATCH /tickets/{id}/status`)
+- Optional status filtering (`GET /tickets?status=Submitted`)
+- Validation for required fields and supported statuses
+- xUnit integration tests using SQLite in-memory
+- Automated builds and testing through GitHub Actions
 
-The initial Ticket API has been tested successfully, with five automated tests passing in both Debug and Release configurations.
+### Ticket Filtering
+
+Issue #13 adds optional status filtering to the existing `GET /tickets` endpoint.
+
+Examples:
+
+- `GET /tickets` returns all tickets.
+- `GET /tickets?status=Submitted` returns submitted tickets.
+- `GET /tickets?status=In%20Development` returns tickets currently in development.
+
+The endpoint accepts status values regardless of capitalization and ignores extra spaces.
+
+Invalid status values return HTTP 400.
+
+Two new automated integration tests were added to verify successful filtering and invalid status handling.
+
+**Latest local test results: 12 tests passed, 0 failed.**
 
 ### Planned Components
 
-The following functionality is part of the proposed architecture but has not yet been implemented:
+The following functionality has not yet been implemented:
 
-- PostgreSQL database integration using Entity Framework Core
-- Persistent ticket storage and updates
-- User authentication and role-based permissions
+- Valid ticket status transition rules
 - Developer assignments and team routing
-- Ticket status transitions and activity history
+- Ticket activity history
+- User authentication and role-based permissions
 - AI-assisted ticket classification and prioritization
 - Development-to-QA workflow
-- Frontend application and reporting dashboard
+- React frontend and reporting dashboard
 
 ### Next Development Steps
 
-The next priority is replacing temporary in-memory storage with PostgreSQL persistence.
+The current priority is completing Issue #13 and merging the ticket filtering functionality into the main branch.
 
-Future work will continue incrementally, following the existing modular architecture and expanding the API as additional features are implemented.
+Future work will focus on developer assignments, ticket status transition rules, activity tracking, authentication, and eventually AI-assisted ticket routing.
+
+The project will continue to follow its modular architecture, with new features added and tested incrementally.
